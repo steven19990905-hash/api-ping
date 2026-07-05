@@ -315,6 +315,15 @@
 
   // ── Init ──
   function init() {
+    // Parse keys from URL hash: #dk=KEY1&ck=KEY2
+    const hash = window.location.hash.slice(1);
+    if (hash) {
+      const params = new URLSearchParams(hash);
+      if (params.get('dk')) localStorage.setItem('pk_deepseek', params.get('dk'));
+      if (params.get('ck')) localStorage.setItem('pk_claude',   params.get('ck'));
+      // Clean hash so keys aren't visible in the address bar
+      history.replaceState(null, '', window.location.pathname);
+    }
     GROUPS.forEach(g => renderModelList(g));
     const allSet = GROUPS.every(g => localStorage.getItem(g.storageKey));
     if (allSet) document.getElementById('setup').style.display = 'none';
