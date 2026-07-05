@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>API Ping</title>
+  <style>
+    :root {
+      --bg: #0d0f18;
+      --surface: #161824;
+      --border: #252840;
+      --text: #e8eaf0;
+      --muted: #5a5f7a;
+      --ok: #3dd68c;
+      --fail: #ff5f6d;
+      --warn: #f0a500;
+      --accent: #6366f1;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 1.5rem 1rem 2rem;
+      gap: 1.25rem;
+    }
+
+    /* ── Setup overlay ── */
+    #setup {
+      position: fixed; inset: 0;
+      background: #0d0f18f5;
+      backdrop-filter: blur(6px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      gap: 1rem;
+      z-index: 100;
+    }
+    #setup h2 { font-size: 1.1rem; color: var(--text); }
+    #setup p  { font-size: 0.8rem; color: var(--muted); text-align: center; }
+
+    .setup-group {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1rem;
+      width: 100%;
+      max-width: 400px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .setup-group label { font-size: 0.78rem; color: var(--muted); font-weight: 500; }
+    .setup-group input {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 0.55rem 0.75rem;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      outline: none;
+      width: 100%;
+      font-family: monospace;
+    }
+    .setup-group input:focus { border-color: var(--accent); }
+
+    .setup-save {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      padding: 0.75rem;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+      max-width: 400px;
+    }
+
+    /* ── Header ── */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      max-width: 480px;
+    }
+    .header h1 { font-size: 1rem; font-weight: 600; color: var(--muted); letter-spacing: 0.05em; }
+    .edit-btn {
+      font-size: 0.75rem;
+      color: var(--muted);
+      background: none;
+      border: 1px solid var(--border);
+      padding: 0.3rem 0.65rem;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    /* ── Cards ── */
+    .cards {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      width: 100%;
+      max-width: 480px;
+    }
+
+    .group-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      transition: border-color 0.2s;
+    }
+    .group-card.ok   { border-color: #3dd68c40; }
+    .group-card.fail { border-color: #ff5f6d40; }
+
+    .group-header {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.85rem 1rem 0.7rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .group-icon { width: 20px; height: 20px; object-fit: contain; flex-shrink: 0; }
+    .group-name { font-size: 0.9rem; font-weight: 600; flex: 1; }
+    .group-badge {
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 0.2rem 0.55rem;
+      border-radius: 20px;
+      background: var(--border);
+      color: var(--muted);
+    }
+    .group-badge.ok   { background: #3dd68c20; color: var(--ok); }
+    .group-badge.fail { background: #ff5f6d20; color: var(--fail); }
+
+    .model-list { padding: 0.5rem 0; }
+
+    .model-row {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.45rem 1rem;
+    }
+
+    .model-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--border);
+      flex-shrink: 0;
+      transition: background 0.3s;
+    }
+    .model-dot.ok   { background: var(--ok); box-shadow: 0 0 6px var(--ok); }
+    .model-dot.fail { background: var(--fail); box-shadow: 0 0 6px var(--fail); }
+    .model-dot.testing {
+      background: var(--accent);
+      animation: pulse 0.8s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%       { opacity: 0.4; transform: scale(0.7); }
+    }
+
+    .model-id {
+      font-size: 0.8rem;
+      font-family: monospace;
+      color: var(--text);
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .model-info {
+      font-size: 0.72rem;
+      color: var(--muted);
+      text-align: right;
+      min-width: 44px;
+    }
+    .model-info.ok   { color: var(--ok); }
+    .model-info.fail { color: var(--fail); }
+
+    .model-error {
+      font-size: 0.68rem;
+      color: var(--fail);
+      padding: 0 1rem 0.4rem 2.3rem;
+      line-height: 1.3;
+    }
+
+    /* ── Ping button ── */
+    .ping-wrap {
+      width: 100%;
+      max-width: 480px;
+      margin-top: 0.25rem;
+    }
+
+    #pingBtn {
+      width: 100%;
+      padding: 1.1rem;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 14px;
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s, box-shadow 0.2s;
+      box-shadow: 0 4px 20px #6366f140;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+    #pingBtn:active { transform: scale(0.97); }
+    #pingBtn:disabled {
+      background: #2d3060;
+      box-shadow: none;
+      cursor: not-allowed;
+    }
+    #pingBtn.success { background: #1e7a4a; box-shadow: 0 4px 20px #3dd68c40; }
+    #pingBtn.error   { background: #7a1e27; box-shadow: 0 4px 20px #ff5f6d40; }
+
+    /* ── Footer ── */
+    .footer {
+      font-size: 0.7rem;
+      color: var(--muted);
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Setup overlay -->
+<div id="setup">
+  <h2>⚡ 初次設定</h2>
+  <p>設定後會存在瀏覽器，之後只需按 PING</p>
+
+  <div class="setup-group">
+    <label>🤖 DeepSeek Key（PackyAPI）</label>
+    <input type="password" id="keyDeepseek" placeholder="sk-..." />
+  </div>
+
+  <div class="setup-group">
+    <label>🟣 Claude Key（PackyAPI）</label>
+    <input type="password" id="keyClaude" placeholder="sk-..." />
+  </div>
+
+  <button class="setup-save" onclick="saveSetup()">儲存並開始</button>
+</div>
+
+<!-- Main UI -->
+<div class="header">
+  <h1>API STATUS</h1>
+  <button class="edit-btn" onclick="openSetup()">✏ 修改 Key</button>
+</div>
+
+<div class="cards" id="cards">
+
+  <!-- DeepSeek Group -->
+  <div class="group-card" id="grp-deepseek">
+    <div class="group-header">
+      <img class="group-icon" src="https://www.deepseek.com/favicon.ico" alt="DeepSeek" />
+      <span class="group-name">DeepSeek</span>
+      <span class="group-badge" id="badge-deepseek">待機</span>
+    </div>
+    <div class="model-list" id="list-deepseek"></div>
+  </div>
+
+  <!-- Claude Group -->
+  <div class="group-card" id="grp-claude">
+    <div class="group-header">
+      <img class="group-icon" src="https://www.anthropic.com/favicon.ico" alt="Anthropic" />
+      <span class="group-name">Claude</span>
+      <span class="group-badge" id="badge-claude">待機</span>
+    </div>
+    <div class="model-list" id="list-claude"></div>
+  </div>
+
+</div>
+
+<div class="ping-wrap">
+  <button id="pingBtn" onclick="pingAll()">⚡ PING ALL</button>
+</div>
+
+<div class="footer" id="footer">—</div>
+
+<script>
+  const BASE = 'https://www.packyapi.com';
+
+  const GROUPS = [
+    {
+      id: 'deepseek',
+      keyId: 'keyDeepseek',
+      storageKey: 'pk_deepseek',
+      models: ['deepseek-v4-flash', 'deepseek-v4-pro']
+    },
+    {
+      id: 'claude',
+      keyId: 'keyClaude',
+      storageKey: 'pk_claude',
+      models: ['claude-sonnet-4-6']
+    }
+  ];
+
+  // ── Init ──
+  function init() {
+    GROUPS.forEach(g => renderModelList(g));
+    const allSet = GROUPS.every(g => localStorage.getItem(g.storageKey));
+    if (allSet) document.getElementById('setup').style.display = 'none';
+  }
+
+  function renderModelList(group) {
+    const container = document.getElementById('list-' + group.id);
+    container.innerHTML = group.models.map(m => `
+      <div class="model-row" id="row-${m}">
+        <span class="model-dot" id="dot-${m}"></span>
+        <span class="model-id">${m}</span>
+        <span class="model-info" id="info-${m}">—</span>
+      </div>
+    `).join('');
+  }
+
+  // ── Setup ──
+  function saveSetup() {
+    GROUPS.forEach(g => {
+      const val = document.getElementById(g.keyId).value.trim();
+      if (val) localStorage.setItem(g.storageKey, val);
+    });
+    const allSet = GROUPS.every(g => localStorage.getItem(g.storageKey));
+    if (!allSet) { alert('請填入所有 API Key'); return; }
+    document.getElementById('setup').style.display = 'none';
+  }
+
+  function openSetup() {
+    GROUPS.forEach(g => {
+      const saved = localStorage.getItem(g.storageKey) || '';
+      document.getElementById(g.keyId).value = saved;
+    });
+    document.getElementById('setup').style.display = 'flex';
+  }
+
+  // ── Ping ──
+  async function pingAll() {
+    const btn = document.getElementById('pingBtn');
+    btn.disabled = true;
+    btn.textContent = '🔄 檢測中…';
+    btn.className = '';
+
+    // Reset UI
+    GROUPS.forEach(g => {
+      setGroupBadge(g.id, 'idle', '檢測中');
+      g.models.forEach(m => {
+        setDot(m, 'testing');
+        setInfo(m, '', '');
+        removeError(m);
+      });
+    });
+
+    const start = Date.now();
+
+    // Run all groups in parallel
+    const results = await Promise.all(GROUPS.map(g => pingGroup(g)));
+
+    const elapsed = ((Date.now() - start) / 1000).toFixed(1);
+    const allOk = results.every(r => r);
+
+    btn.disabled = false;
+    btn.textContent = allOk ? '✅ 全部正常' : '❌ 有異常';
+    btn.className = allOk ? 'success' : 'error';
+
+    setTimeout(() => {
+      btn.textContent = '⚡ PING ALL';
+      btn.className = '';
+    }, 3000);
+
+    document.getElementById('footer').textContent =
+      `最後檢測：${new Date().toLocaleTimeString()}　耗時 ${elapsed}s`;
+  }
+
+  async function pingGroup(group) {
+    const key = localStorage.getItem(group.storageKey);
+    if (!key) {
+      group.models.forEach(m => { setDot(m, 'fail'); setInfo(m, 'no key', 'fail'); });
+      setGroupBadge(group.id, 'fail', '無 Key');
+      return false;
+    }
+
+    const results = await Promise.all(group.models.map(m => pingModel(key, m)));
+    const allOk = results.every(Boolean);
+    setGroupBadge(group.id, allOk ? 'ok' : 'fail', allOk ? '正常' : '異常');
+    document.getElementById('grp-' + group.id).className =
+      'group-card ' + (allOk ? 'ok' : 'fail');
+    return allOk;
+  }
+
+  async function pingModel(key, modelId) {
+    const start = Date.now();
+    try {
+      const res = await fetch(`${BASE}/v1/chat/completions`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${key}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          model: modelId,
+          messages: [{ role: 'user', content: 'hi' }],
+          max_tokens: 1
+        }),
+        signal: AbortSignal.timeout(15000)
+      });
+      const latency = Date.now() - start;
+
+      if (!res.ok) {
+        const j = await res.json().catch(() => ({}));
+        const msg = j?.error?.message || `HTTP ${res.status}`;
+        setDot(modelId, 'fail');
+        setInfo(modelId, `${res.status}`, 'fail');
+        showError(modelId, msg);
+        return false;
+      }
+
+      setDot(modelId, 'ok');
+      setInfo(modelId, formatMs(latency), 'ok');
+      return true;
+    } catch (e) {
+      const latency = Date.now() - start;
+      const isTimeout = e.name === 'TimeoutError' || e.name === 'AbortError';
+      setDot(modelId, 'fail');
+      setInfo(modelId, isTimeout ? 'timeout' : 'error', 'fail');
+      showError(modelId, isTimeout ? `超時 (${formatMs(latency)})` : e.message);
+      return false;
+    }
+  }
+
+  // ── Helpers ──
+  function setDot(modelId, cls) {
+    const el = document.getElementById('dot-' + modelId);
+    if (el) el.className = 'model-dot ' + cls;
+  }
+
+  function setInfo(modelId, text, cls) {
+    const el = document.getElementById('info-' + modelId);
+    if (el) { el.textContent = text; el.className = 'model-info ' + cls; }
+  }
+
+  function showError(modelId, msg) {
+    const row = document.getElementById('row-' + modelId);
+    if (!row) return;
+    let err = document.getElementById('err-' + modelId);
+    if (!err) {
+      err = document.createElement('div');
+      err.id = 'err-' + modelId;
+      err.className = 'model-error';
+      row.after(err);
+    }
+    err.textContent = msg;
+  }
+
+  function removeError(modelId) {
+    const el = document.getElementById('err-' + modelId);
+    if (el) el.remove();
+  }
+
+  function setGroupBadge(groupId, cls, text) {
+    const el = document.getElementById('badge-' + groupId);
+    if (el) { el.textContent = text; el.className = 'group-badge ' + cls; }
+  }
+
+  function formatMs(ms) {
+    return ms >= 1000 ? (ms / 1000).toFixed(1) + 's' : ms + 'ms';
+  }
+
+  init();
+</script>
+</body>
+</html>
