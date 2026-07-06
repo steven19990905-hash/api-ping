@@ -1,29 +1,19 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no" />
-<meta name="apple-mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-title" content="API Ping" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="API Ping">
 <title>🌸 API Ping</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌸</text></svg>">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{
-  background:linear-gradient(160deg,#FFE8EF,#FFF5F7);
-  color:#4A3642;
-  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;
-  min-height:100dvh;
-  display:flex;flex-direction:column;align-items:center;
-  padding:1.5rem 1rem 2rem;gap:1.25rem;position:relative;overflow-x:hidden
-}
+body{background:linear-gradient(160deg,#FFE8EF,#FFF5F7);color:#4A3642;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;min-height:100dvh;display:flex;flex-direction:column;align-items:center;padding:1.5rem 1rem 2rem;gap:1.25rem;position:relative;overflow-x:hidden}
 .sakura{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;overflow:hidden}
 @keyframes f{0%{transform:translateY(-10vh) rotate(0deg);opacity:0}10%{opacity:.7}100%{transform:translateY(110vh) rotate(720deg);opacity:0}}
 .petal{position:absolute;top:-10vh;width:20px;height:20px;background:#FFD6E0;border-radius:50% 0 50% 0;opacity:0;animation:f linear infinite}
 .header{display:flex;align-items:center;justify-content:space-between;width:100%;max-width:480px;position:relative;z-index:1}
-.char-wrap{display:flex;align-items:center;justify-content:center;width:100%;max-width:480px;position:relative;z-index:1;margin-top:-.5rem}
-.char-wrap svg{width:120px;height:120px;filter:drop-shadow(0 4px 12px rgba(255,143,171,.2))}
-.char-wrap img{width:120px;height:120px;object-fit:cover;border-radius:50%;border:3px solid rgba(255,183,197,.5);box-shadow:0 4px 20px rgba(255,143,171,.3)}
 .header h1{font-size:1rem;font-weight:500;color:#A88995;letter-spacing:.1em}
 .header h1::before{content:'🌸 '}
 .edit-btn{font-size:.75rem;color:#FF8FAB;background:rgba(255,255,255,.7);border:1px solid rgba(255,183,197,.4);padding:.3rem .75rem;border-radius:20px;cursor:pointer}
@@ -55,6 +45,8 @@ body{
 #pingBtn:disabled{background:linear-gradient(135deg,#E8C4CD,#D4A0B0);box-shadow:none;cursor:not-allowed}
 #pingBtn.success{background:linear-gradient(135deg,#6BCB9E,#4FB883)}
 #pingBtn.error{background:linear-gradient(135deg,#FF6B8A,#E55A78)}
+.char-wrap{display:flex;align-items:center;justify-content:center;width:100%;max-width:480px;position:relative;z-index:1;margin-top:0}
+.char-wrap svg{width:200px;height:280px;filter:drop-shadow(0 4px 20px rgba(255,143,171,.25))}
 .footer{font-size:.7rem;color:#A88995;text-align:center;position:relative;z-index:1}
 #setup{position:fixed;inset:0;background:rgba(255,240,245,.95);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:1.5rem;gap:1rem;z-index:200}
 #setup h2{font-size:1.3rem;color:#FF6B8A;font-weight:500}
@@ -72,21 +64,118 @@ body{
 <div id="setup">
 <h2>初次設定</h2>
 <p>設定後會存在瀏覽器，之後只需按 PING</p>
-<div class="setup-group"><label>🤖 DeepSeek Key</label><input type="password" id="keyDeepseek" placeholder="sk-..." /></div>
-<div class="setup-group"><label>🟣 Claude Key</label><input type="password" id="keyClaude" placeholder="sk-..." /></div>
+<div class="setup-group"><label>🤖 DeepSeek Key</label><input type="password" id="keyDeepseek" placeholder="sk-..."></div>
+<div class="setup-group"><label>🟣 Claude Key</label><input type="password" id="keyClaude" placeholder="sk-..."></div>
 <button class="setup-save" onclick="saveSetup()">儲存並開始</button>
 </div>
 <div class="header"><h1>API STATUS</h1><button class="edit-btn" onclick="openSetup()">✏ Key</button></div>
-<div class="char-wrap"><img src="https://nekos.best/api/v2/neko/fce878b4-f97a-4b3a-87fe-546c478b6010.png" alt="sakura girl" /></div>
 <div class="cards" id="cards">
 <div class="group-card" id="grp-deepseek">
-<div class="group-header"><img class="group-icon" src="https://www.deepseek.com/favicon.ico" alt="DeepSeek" /><span class="group-name">DeepSeek</span><span class="group-badge" id="badge-deepseek">待機</span></div>
+<div class="group-header"><img class="group-icon" src="https://www.deepseek.com/favicon.ico" alt="DeepSeek"><span class="group-name">DeepSeek</span><span class="group-badge" id="badge-deepseek">待機</span></div>
 <div class="model-list" id="list-deepseek"></div></div>
 <div class="group-card" id="grp-claude">
-<div class="group-header"><img class="group-icon" src="https://www.anthropic.com/favicon.ico" alt="Anthropic" /><span class="group-name">Claude</span><span class="group-badge" id="badge-claude">待機</span></div>
+<div class="group-header"><img class="group-icon" src="https://www.anthropic.com/favicon.ico" alt="Anthropic"><span class="group-name">Claude</span><span class="group-badge" id="badge-claude">待機</span></div>
 <div class="model-list" id="list-claude"></div></div>
 </div>
 <div class="ping-wrap"><button id="pingBtn" onclick="pingAll()">⚡ PING ALL</button></div>
+<div class="char-wrap"><svg viewBox="0 0 300 420" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="faceGrad" cx="50%" cy="50%">
+      <stop offset="0%" stop-color="#FFEDE3"/><stop offset="100%" stop-color="#FDDDCB"/>
+    </radialGradient>
+    <linearGradient id="hairGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#2A1610"/><stop offset="100%" stop-color="#1A0D08"/>
+    </linearGradient>
+    <linearGradient id="kimoGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FFC8D6"/><stop offset="50%" stop-color="#FFB0C4"/><stop offset="100%" stop-color="#FF96B0"/>
+    </linearGradient>
+    <linearGradient id="obiGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#E84F70"/><stop offset="50%" stop-color="#FF6B8A"/><stop offset="100%" stop-color="#E84F70"/>
+    </linearGradient>
+  </defs>
+  <!-- Hair back -->
+  <ellipse cx="150" cy="170" rx="75" ry="85" fill="url(#hairGrad)"/>
+  <!-- Hair long flowing sides -->
+  <path d="M80 160 Q60 200 55 260 Q52 290 60 310 Q65 320 75 315 Q85 310 82 280 Q80 250 85 210Z" fill="url(#hairGrad)"/>
+  <path d="M220 160 Q240 200 245 260 Q248 290 240 310 Q235 320 225 315 Q215 310 218 280 Q220 250 215 210Z" fill="url(#hairGrad)"/>
+  <!-- Neck -->
+  <rect x="138" y="185" width="24" height="15" rx="6" fill="#FDDDCB"/>
+  <!-- Body / Kimono upper -->
+  <path d="M105 195 L125 195 L130 200 L135 195 L165 195 L170 200 L175 195 L195 195 Q200 210 198 230 L192 230 Q185 225 178 228 Q175 230 170 230 L130 230 Q125 230 122 228 Q115 225 108 230 L102 230 Q100 210 105 195Z" fill="url(#kimoGrad)"/>
+  <!-- Kimono collar (eri) -->
+  <path d="M130 195 L135 200 L135 230 L130 230Z" fill="#FFF" opacity=".6"/>
+  <path d="M170 195 L165 200 L165 230 L170 230Z" fill="#FFF" opacity=".6"/>
+  <!-- Kimono body -->
+  <path d="M95 230 L102 230 Q105 240 108 260 L110 330 Q112 360 115 380 L120 390 L130 390 L130 320 Q130 300 135 280 L140 270 L145 280 Q150 300 150 320 L150 390 L160 390 L165 380 Q168 360 170 330 L172 260 Q175 240 178 230 L185 230 L200 230 Q198 240 195 260 L190 330 Q188 360 185 380 L180 390 L170 390 L170 350 Q168 340 165 330 L155 330 Q150 330 148 340 L148 390 L138 390 L138 340 Q136 330 130 330 L120 330 Q115 340 115 350 L115 390 L105 390 L100 380 Q95 360 95 330 L90 260 Q88 240 95 230Z" fill="url(#kimoGrad)"/>
+  <!-- Obi (belt) -->
+  <rect x="92" y="248" width="116" height="18" rx="5" fill="url(#obiGrad)"/>
+  <rect x="92" y="266" width="116" height="4" rx="2" fill="#C44060" opacity=".5"/>
+  <!-- Obi bow -->
+  <path d="M130 248 Q120 235 115 240 Q110 245 120 248Z" fill="#E84F70"/>
+  <path d="M170 248 Q180 235 185 240 Q190 245 180 248Z" fill="#E84F70"/>
+  <!-- Sakura flowers on kimono -->
+  <g fill="#FFD6E0" opacity=".7">
+    <circle cx="115" cy="290" r="5"/><circle cx="115" cy="290" r="2" fill="#FF8FAB"/>
+    <circle cx="155" cy="310" r="4.5"/><circle cx="155" cy="310" r="1.8" fill="#FF8FAB"/>
+    <circle cx="130" cy="350" r="5"/><circle cx="130" cy="350" r="2" fill="#FF8FAB"/>
+    <circle cx="170" cy="280" r="4"/><circle cx="170" cy="280" r="1.5" fill="#FF8FAB"/>
+    <circle cx="140" cy="370" r="3.5"/><circle cx="140" cy="370" r="1.5" fill="#FF8FAB"/>
+    <circle cx="110" cy="320" r="3"/><circle cx="110" cy="320" r="1.2" fill="#FF8FAB"/>
+    <circle cx="180" cy="340" r="4"/><circle cx="180" cy="340" r="1.5" fill="#FF8FAB"/>
+  </g>
+  <!-- Sleeves -->
+  <path d="M95 230 L75 235 Q65 260 63 290 Q62 310 68 320 Q75 325 80 318 Q85 310 88 280 Q90 260 95 240Z" fill="#FFD0DC"/>
+  <path d="M205 230 L225 235 Q235 260 237 290 Q238 310 232 320 Q225 325 220 318 Q215 310 212 280 Q210 260 205 240Z" fill="#FFD0DC"/>
+  <!-- Face -->
+  <ellipse cx="150" cy="155" rx="43" ry="44" fill="url(#faceGrad)"/>
+  <!-- Hair bangs -->
+  <path d="M107 140 Q110 95 130 80 L128 108Q125 112 122 115Z" fill="url(#hairGrad)"/>
+  <path d="M193 140 Q190 95 170 80 L172 108Q175 112 178 115Z" fill="url(#hairGrad)"/>
+  <path d="M107 140 Q110 88 135 75 Q145 72 150 72 Q155 72 165 75 Q190 88 193 140 L188 125 Q185 95 165 82 Q155 78 150 78 Q145 78 135 82 Q115 95 112 125Z" fill="url(#hairGrad)"/>
+  <!-- Side strands -->
+  <path d="M107 140 Q105 120 108 105 L112 130Z" fill="url(#hairGrad)"/>
+  <path d="M193 140 Q195 120 192 105 L188 130Z" fill="url(#hairGrad)"/>
+  <!-- Eyes -->
+  <ellipse cx="128" cy="152" rx="11" ry="12" fill="#FFF"/>
+  <ellipse cx="172" cy="152" rx="11" ry="12" fill="#FFF"/>
+  <ellipse cx="130" cy="152" rx="7.5" ry="9" fill="#6B3F30"/>
+  <ellipse cx="170" cy="152" rx="7.5" ry="9" fill="#6B3F30"/>
+  <ellipse cx="132" cy="149" rx="4" ry="4.5" fill="#2A1610"/>
+  <ellipse cx="168" cy="149" rx="4" ry="4.5" fill="#2A1610"/>
+  <circle cx="136" cy="147" r="2.5" fill="#FFF" opacity=".85"/>
+  <circle cx="172" cy="147" r="2.5" fill="#FFF" opacity=".85"/>
+  <circle cx="126" cy="149" r="1.5" fill="#FFF" opacity=".6"/>
+  <circle cx="166" cy="149" r="1.5" fill="#FFF" opacity=".6"/>
+  <!-- Eyebrows -->
+  <path d="M115 137 Q128 132 140 137" stroke="#2A1610" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <path d="M160 137 Q172 132 185 137" stroke="#2A1610" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <!-- Blush -->
+  <ellipse cx="115" cy="170" rx="9" ry="4.5" fill="#FFA0A0" opacity=".4"/>
+  <ellipse cx="185" cy="170" rx="9" ry="4.5" fill="#FFA0A0" opacity=".4"/>
+  <!-- Nose -->
+  <path d="M148 162 Q150 168 150 170" stroke="#D4A090" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+  <!-- Mouth -->
+  <path d="M140 175 Q145 180 150 180 Q155 180 160 175" stroke="#D4756B" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  <path d="M143 177 Q147 181 150 181 Q153 181 157 177" fill="#E8908A" opacity=".6"/>
+  <!-- Sakura hair ornament left -->
+  <circle cx="108" cy="95" r="7" fill="#FFB7C5"/><circle cx="108" cy="95" r="3.5" fill="#FF6B8A"/>
+  <circle cx="115" cy="100" r="5" fill="#FFD0DC"/><circle cx="115" cy="100" r="2.5" fill="#FF8FAB"/>
+  <!-- Sakura hair ornament right -->
+  <circle cx="192" cy="95" r="7" fill="#FFB7C5"/><circle cx="192" cy="95" r="3.5" fill="#FF6B8A"/>
+  <circle cx="185" cy="100" r="5" fill="#FFD0DC"/><circle cx="185" cy="100" r="2.5" fill="#FF8FAB"/>
+  <!-- Falling sakura petals around character -->
+  <g fill="#FFB7C5" opacity=".6">
+    <ellipse cx="65" cy="180" rx="4" ry="3" transform="rotate(30 65 180)"/>
+    <ellipse cx="235" cy="200" rx="3.5" ry="2.5" transform="rotate(-20 235 200)"/>
+    <ellipse cx="80" cy="280" rx="4" ry="2.5" transform="rotate(45 80 280)"/>
+    <ellipse cx="220" cy="300" rx="3" ry="2" transform="rotate(-35 220 300)"/>
+    <ellipse cx="70" cy="340" rx="3.5" ry="2.5" transform="rotate(15 70 340)"/>
+    <ellipse cx="230" cy="360" rx="4" ry="3" transform="rotate(-45 230 360)"/>
+  </g>
+  <!-- Small gohei/sakura accessory -->
+  <circle cx="112" cy="88" r="2" fill="#FFF" opacity=".5"/>
+  <circle cx="188" cy="88" r="2" fill="#FFF" opacity=".5"/>
+</svg></div>
 <div class="footer" id="footer">—</div>
 <script>
 const BASE='https://www.packyapi.com',GROUPS=[{id:'deepseek',keyId:'keyDeepseek',storageKey:'pk_deepseek',models:['deepseek-v4-flash','deepseek-v4-pro']},{id:'claude',keyId:'keyClaude',storageKey:'pk_claude',models:['claude-sonnet-4-6']}];
