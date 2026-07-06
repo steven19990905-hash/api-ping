@@ -23,6 +23,7 @@ body{
 .header{display:flex;align-items:center;justify-content:space-between;width:100%;max-width:480px;position:relative;z-index:1}
 .char-wrap{display:flex;align-items:center;justify-content:center;width:100%;max-width:480px;position:relative;z-index:1;margin-top:-.5rem}
 .char-wrap svg{width:120px;height:120px;filter:drop-shadow(0 4px 12px rgba(255,143,171,.2))}
+.char-wrap img{width:120px;height:120px;object-fit:cover;border-radius:50%;border:3px solid rgba(255,183,197,.5);box-shadow:0 4px 20px rgba(255,143,171,.3)}
 .header h1{font-size:1rem;font-weight:500;color:#A88995;letter-spacing:.1em}
 .header h1::before{content:'🌸 '}
 .edit-btn{font-size:.75rem;color:#FF8FAB;background:rgba(255,255,255,.7);border:1px solid rgba(255,183,197,.4);padding:.3rem .75rem;border-radius:20px;cursor:pointer}
@@ -76,7 +77,7 @@ body{
 <button class="setup-save" onclick="saveSetup()">儲存並開始</button>
 </div>
 <div class="header"><h1>API STATUS</h1><button class="edit-btn" onclick="openSetup()">✏ Key</button></div>
-<div class="char-wrap"><img src="https://cdn.jsdelivr.net/gh/steven19990905-hash/api-ping@main/sakura-girl.webp" alt="sakura girl" /></div>
+<div class="char-wrap"><img src="https://nekos.best/api/v2/neko/fce878b4-f97a-4b3a-87fe-546c478b6010.png" alt="sakura girl" /></div>
 <div class="cards" id="cards">
 <div class="group-card" id="grp-deepseek">
 <div class="group-header"><img class="group-icon" src="https://www.deepseek.com/favicon.ico" alt="DeepSeek" /><span class="group-name">DeepSeek</span><span class="group-badge" id="badge-deepseek">待機</span></div>
