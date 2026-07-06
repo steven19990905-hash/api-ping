@@ -45,9 +45,8 @@ body{background:linear-gradient(160deg,#FFE8EF,#FFF5F7);color:#4A3642;font-famil
 #pingBtn:disabled{background:linear-gradient(135deg,#E8C4CD,#D4A0B0);box-shadow:none;cursor:not-allowed}
 #pingBtn.success{background:linear-gradient(135deg,#6BCB9E,#4FB883)}
 #pingBtn.error{background:linear-gradient(135deg,#FF6B8A,#E55A78)}
-.char-wrap{display:flex;align-items:center;justify-content:center;width:100%;max-width:480px;position:relative;z-index:1;margin-top:0}
-.char-wrap svg{width:200px;height:280px;filter:drop-shadow(0 4px 20px rgba(255,143,171,.25))}
-.char-wrap img{width:200px;height:200px;object-fit:cover;border-radius:18px;box-shadow:0 4px 24px rgba(255,143,171,.3);border:2px solid rgba(255,183,197,.4)}
+.char-wrap{display:flex;align-items:center;justify-content:center;width:100%;max-width:480px;position:relative;z-index:1;margin-top:.5rem}
+.char-wrap img{width:100%;height:auto;border-radius:18px;box-shadow:0 6px 30px rgba(255,143,171,.35);border:2px solid rgba(255,183,197,.4);display:block}
 .footer{font-size:.7rem;color:#A88995;text-align:center;position:relative;z-index:1}
 #setup{position:fixed;inset:0;background:rgba(255,240,245,.95);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:1.5rem;gap:1rem;z-index:200}
 #setup h2{font-size:1.3rem;color:#FF6B8A;font-weight:500}
@@ -79,6 +78,7 @@ body{background:linear-gradient(160deg,#FFE8EF,#FFF5F7);color:#4A3642;font-famil
 <div class="model-list" id="list-claude"></div></div>
 </div>
 <div class="ping-wrap"><button id="pingBtn" onclick="pingAll()">⚡ PING ALL</button></div>
+<div class="char-wrap"><img src="https://cdn.jsdelivr.net/gh/steven19990905-hash/api-ping@main/sakura-girl-final.webp" alt="sakura girl"></div>
 <div class="footer" id="footer">—</div>
 <script>
 const BASE='https://www.packyapi.com',GROUPS=[{id:'deepseek',keyId:'keyDeepseek',storageKey:'pk_deepseek',models:['deepseek-v4-flash','deepseek-v4-pro']},{id:'claude',keyId:'keyClaude',storageKey:'pk_claude',models:['claude-sonnet-4-6']}];
