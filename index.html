@@ -69,6 +69,7 @@ body{background:linear-gradient(160deg,#FFE8EF,#FFF5F7);color:#4A3642;font-famil
 <p>設定後會存在瀏覽器，之後只需按 PING</p>
 <div class="setup-group"><label>🤖 DeepSeek Key</label><input type="password" id="keyDeepseek" placeholder="sk-..."></div>
 <div class="setup-group"><label>🟣 Claude Key</label><input type="password" id="keyClaude" placeholder="sk-..."></div>
+<div class="setup-group"><label>🔥 Grok Key</label><input type="password" id="keyGrok" placeholder="sk-..."></div>
 <button class="setup-save" onclick="saveSetup()">儲存並開始</button>
 </div>
 <div class="header"><h1>API STATUS</h1><button class="edit-btn" onclick="openSetup()">✏ Key</button></div>
@@ -79,14 +80,17 @@ body{background:linear-gradient(160deg,#FFE8EF,#FFF5F7);color:#4A3642;font-famil
 <div class="group-card" id="grp-claude">
 <div class="group-header"><img class="group-icon" src="https://www.anthropic.com/favicon.ico" alt="Anthropic"><span class="group-name">Claude</span><span class="group-badge" id="badge-claude">待機</span></div>
 <div class="model-list" id="list-claude"></div></div>
+<div class="group-card" id="grp-grok">
+<div class="group-header"><img class="group-icon" src="https://x.com/favicon.ico" alt="xAI"><span class="group-name">Grok</span><span class="group-badge" id="badge-grok">待機</span></div>
+<div class="model-list" id="list-grok"></div></div>
 </div>
 <div class="ping-wrap"><button id="pingBtn" onclick="pingAll()">⚡ PING ALL</button></div>
 <div class="char-wrap"><img src="https://cdn.jsdelivr.net/gh/steven19990905-hash/api-ping@dfebd9c/sakura-girl-hd.webp" alt="sakura girl"></div>
 <div class="footer" id="footer">—</div>
 <script>
-const BASE='https://www.packyapi.com',GROUPS=[{id:'deepseek',keyId:'keyDeepseek',storageKey:'pk_deepseek',models:['deepseek-v4-flash','deepseek-v4-pro']},{id:'claude',keyId:'keyClaude',storageKey:'pk_claude',models:['claude-sonnet-4-6']}];
+const BASE='https://www.packyapi.com',GROUPS=[{id:'deepseek',keyId:'keyDeepseek',storageKey:'pk_deepseek',models:['deepseek-v4-flash','deepseek-v4-pro']},{id:'claude',keyId:'keyClaude',storageKey:'pk_claude',models:['claude-sonnet-4-6']},{id:'grok',keyId:'keyGrok',storageKey:'pk_grok',models:['grok-4.5']}];
 function sakura(){const c=document.getElementById('sakura');for(let i=18;i--;){const p=document.createElement('div');p.className='petal';p.style.left=Math.random()*100+'%';p.style.animationDuration=(10+Math.random()*12)+'s';p.style.animationDelay=Math.random()*-20+'s';const s=12+Math.random()*14;p.style.width=s+'px';p.style.height=s+'px';c.appendChild(p)}}
-function init(){sakura();const h=location.hash.slice(1);if(h){const p=new URLSearchParams(h);if(p.get('dk'))localStorage.setItem('pk_deepseek',p.get('dk'));if(p.get('ck'))localStorage.setItem('pk_claude',p.get('ck'));history.replaceState(null,'',location.pathname)}
+function init(){sakura();const h=location.hash.slice(1);if(h){const p=new URLSearchParams(h);if(p.get('dk'))localStorage.setItem('pk_deepseek',p.get('dk'));if(p.get('ck'))localStorage.setItem('pk_claude',p.get('ck'));if(p.get('gk'))localStorage.setItem('pk_grok',p.get('gk'));history.replaceState(null,'',location.pathname)}
 GROUPS.forEach(g=>{const c=document.getElementById('list-'+g.id);c.innerHTML=g.models.map(m=>'<div class="model-row" id="row-'+m+'"><span class="model-dot" id="dot-'+m+'"></span><span class="model-id">'+m+'</span><span class="model-info" id="info-'+m+'">—</span></div>').join('')})
 if(GROUPS.every(g=>localStorage.getItem(g.storageKey)))document.getElementById('setup').style.display='none'}
 function saveSetup(){GROUPS.forEach(g=>{const v=document.getElementById(g.keyId).value.trim();if(v)localStorage.setItem(g.storageKey,v)});if(!GROUPS.every(g=>localStorage.getItem(g.storageKey))){alert('請填入所有 API Key');return};document.getElementById('setup').style.display='none'}
